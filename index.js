@@ -48,10 +48,19 @@ async function run() {
     const bookedCollection=client.db('serviceBooked').collection('booking');
 
     app.get('/service',async(req,res)=>{
-        const cursor=doctorCollection.find();
-        const result=await cursor.toArray();
+        const page=parseInt(req.query.page) || 0;
+        const limit=parseInt(req.query.limit) || 2;
+        const skip=page*limit;
+        const result=await doctorCollection.find().skip(skip).limit(limit).toArray()
+        // const cursor=doctorCollection.find();
+        // const result=await cursor.toArray();
         res.send(result);
     });
+
+    app.get('/totalService',async(req,res)=>{
+        const result=await doctorCollection.estimatedDocumentCount();
+        res.send({total:result})
+    })
 
     app.get('/service/:id',async(req,res)=>{
         const id=req.params.id;
