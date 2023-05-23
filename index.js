@@ -52,8 +52,6 @@ async function run() {
         const limit=parseInt(req.query.limit) || 2;
         const skip=page*limit;
         const result=await doctorCollection.find().skip(skip).limit(limit).toArray()
-        // const cursor=doctorCollection.find();
-        // const result=await cursor.toArray();
         res.send(result);
     });
 
@@ -90,10 +88,25 @@ async function run() {
         res.send(result)
     });
 
+    app.post('/addService',async(req,res)=>{
+      const doctors=req.body
+      const result=await doctorCollection.insertOne(doctors);
+      res.send(doctors)
+    })
+
+    app.get('/myServices',async(req,res)=>{
+      let query={}
+      if(req.query?.email){
+        query={providerEmail:req.query.email}
+      }
+      const result=await doctorCollection.find(query).toArray();
+      res.send(result)
+    })
+
     app.post('/jwt', (req,res)=>{
         const user=req.body;
         const token=jwt.sign( user, process.env.ACCESS_TOKEN, {
-          expiresIn:'1h'
+          expiresIn:'5h'
         });
         res.send({token})
     })
